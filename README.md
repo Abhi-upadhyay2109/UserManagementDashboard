@@ -1,23 +1,23 @@
 # User Management Dashboard
 
 A modern **User Management Dashboard** built with **React** and **TailwindCSS**.  
-This project allows you to manage users with basic CRUD operations using a mock backend API (**JSONPlaceholder**).
+This project allows you to manage users with basic CRUD operations using a mock backend API (**JSONPlaceholder**) and supports locally added users.
 
 ---
 
 ## Features
 
-- View a list of users with details: **ID, Name, Email, Department**  
+- View a list of users with details: **ID, First Name, Last Name, Email, Department**  
 - Add new users with **auto-incrementing ID**  
-- Edit existing users  
+- Edit existing users (locally added users included)  
 - Delete users  
 - **Pagination** with dynamic limit selection (10, 25, 50, 100)  
 - **Search** by name  
-- **Filter** by department  
+- **Filter** by department, first name, last name, and email  
 - **Toast notifications** on add, edit, and delete actions  
-- Fully **responsive UI** with TailwindCSS
+- Fully **responsive UI** with TailwindCSS  
 
-
+---
 1. **Install dependencies**
 
    ```npm install```
