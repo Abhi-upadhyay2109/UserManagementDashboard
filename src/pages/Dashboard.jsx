@@ -5,7 +5,6 @@ import UserTable from "../components/UserTable";
 import Pagination from "../components/Pagination";
 import toast from "react-hot-toast";
 
-
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
@@ -21,74 +20,78 @@ const Dashboard = () => {
   const fetchUsers = async () => {
     try {
       const res = await axios.get("https://jsonplaceholder.typicode.com/users");
-      setUsers(res.data);
+      const apiUsers = res.data.map((u) => {
+        const [firstName, ...lastParts] = u.name.split(" ");
+        return {
+          id: u.id,
+          firstName,
+          lastName: lastParts.join(" "),
+          email: u.email,
+          company: { name: u.company?.name || "" },
+        };
+      });
+      setUsers(apiUsers);
     } catch {
       alert("Failed to fetch users");
     }
   };
 
-const addUser = async (user) => {
-  try {
-    const maxId = users.length ? Math.max(...users.map(u => u.id)) : 0;
-    const newUser = { ...user, id: maxId + 1 };
-    await axios.post("https://jsonplaceholder.typicode.com/users", newUser);
-    setUsers([...users, newUser]);
-    toast.success("User added successfully!");
-  } catch {
-    toast.error("Failed to add user");
-  }
-};
+  const addUser = async (user) => {
+    try {
+      const maxId = users.length ? Math.max(...users.map((u) => u.id)) : 0;
+      const newUser = { ...user, id: maxId + 1 };
+      await axios.post("https://jsonplaceholder.typicode.com/users", newUser);
+      setUsers([...users, newUser]);
+      toast.success("User added successfully!");
+    } catch {
+      toast.error("Failed to add user");
+    }
+  };
 
-
- const editUser = async (user) => {
+  const editUser = async (user) => {
   try {
-    await axios.put(`https://jsonplaceholder.typicode.com/users/${user.id}`, user);
+    if (user.id <= 10) {
+      await axios.put(`https://jsonplaceholder.typicode.com/users/${user.id}`, user);
+    }
+
+  
     setUsers(users.map((u) => (u.id === user.id ? user : u)));
+
     setEditingUser(null);
     toast.success("User updated successfully!");
   } catch {
+    
     toast.error("Failed to update user");
   }
 };
+
 
   const deleteUser = async (id) => {
     try {
       await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
       setUsers(users.filter((u) => u.id !== id));
-       toast.success("User delete successfully!");
+      toast.success("User deleted successfully!");
     } catch {
-     toast.error("Failed to update user");
+      toast.error("Failed to delete user");
     }
   };
 
   const filteredUsers = users
-    .filter(
-      (u) =>
-        u.name.toLowerCase().includes(search.toLowerCase()) &&
-        (filterDept ? u.company?.name.toLowerCase().includes(filterDept.toLowerCase()) : true)
-    )
+    .filter((u) => {
+      const fullName = `${u.firstName} ${u.lastName}`;
+      const dept = u.company?.name || "";
+      return (
+        fullName.toLowerCase().includes(search.toLowerCase()) &&
+        (filterDept ? dept.toLowerCase().includes(filterDept.toLowerCase()) : true)
+      );
+    })
     .slice((page - 1) * limit, page * limit);
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-center mb-6">User Management Dashboard</h1>
 
-      <div className="flex flex-wrap gap-4 mb-6 justify-center">
-        <input
-          type="text"
-          placeholder="Search by name"
-          className="border rounded px-3 py-2 w-full md:w-64"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Filter by department"
-          className="border rounded px-3 py-2 w-full md:w-64"
-          value={filterDept}
-          onChange={(e) => setFilterDept(e.target.value)}
-        />
-      </div>
+      
 
       <UserForm
         addUser={addUser}
@@ -97,7 +100,11 @@ const addUser = async (user) => {
         setEditingUser={setEditingUser}
       />
 
-      <UserTable users={filteredUsers} deleteUser={deleteUser} setEditingUser={setEditingUser} />
+      <UserTable
+        users={filteredUsers}
+        deleteUser={deleteUser}
+        setEditingUser={setEditingUser}
+      />
 
       <Pagination page={page} setPage={setPage} limit={limit} setLimit={setLimit} />
     </div>

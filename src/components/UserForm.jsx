@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from "react";
 
 const UserForm = ({ addUser, editUser, editingUser, setEditingUser }) => {
-  const [form, setForm] = useState({ name: "", email: "", company: { name: "" } });
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    company: { name: "" },
+  });
 
   useEffect(() => {
-    if (editingUser) setForm(editingUser);
-    else setForm({ name: "", email: "", company: { name: "" } });
+    if (editingUser) {
+      setForm(editingUser);
+    } else {
+      setForm({ firstName: "", lastName: "", email: "", company: { name: "" } });
+    }
   }, [editingUser]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name || !form.email) return alert("Name & Email required");
+    if (!form.firstName || !form.lastName || !form.email) {
+      return alert("First Name, Last Name & Email are required");
+    }
+
     if (editingUser) editUser(form);
     else addUser(form);
-    setForm({ name: "", email: "", company: { name: "" } });
+
+    setForm({ firstName: "", lastName: "", email: "", company: { name: "" } });
   };
 
   return (
@@ -23,10 +35,17 @@ const UserForm = ({ addUser, editUser, editingUser, setEditingUser }) => {
     >
       <input
         type="text"
-        placeholder="Name"
-        className="border px-3 py-2 rounded w-full md:w-64"
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        placeholder="First Name"
+        className="border px-3 py-2 rounded w-full md:w-48"
+        value={form.firstName}
+        onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Last Name"
+        className="border px-3 py-2 rounded w-full md:w-48"
+        value={form.lastName}
+        onChange={(e) => setForm({ ...form, lastName: e.target.value })}
       />
       <input
         type="email"
